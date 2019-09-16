@@ -1,10 +1,11 @@
 /* eslint-disable react/prefer-stateless-function */
 import React from 'react';
 import Form from './Form';
+import DisplayPrice from './DisplayPrice';
 
 class App extends React.Component {
   state = {
-    priceInUsd: 6,
+    priceInUsd: "",
     priceInBtc: "",
     priceInEth: "",
     circulatingSupply: "",
@@ -15,20 +16,26 @@ class App extends React.Component {
     rankInCmc: ""
   }
 
-    async function getPriceAndMcap() {
-      try {
-        const dataResult = await fetch(
-          'https://api.coingecko.com/api/v3/coins/quant-network',
-        );
-        const data = await dataResult.json();
-        console.log(data);
+  componentDidMount () {
+    this.getPriceAndMcap();
   }
 
+  async getPriceAndMcap() {
+    const response = await fetch(`https://api.coingecko.com/api/v3/coins/quant-network`,
+    );
+    const data = await response.json();
+    this.setState({
+      priceInUsd: data.market_data.current_price.usd, 
+      priceInBtc: data.market_data.current_price.btc,
+      priceInEth: data.market_data.current_price.eth
+    });
+  }
+ 
   render() {
     return (
-      <div>
-        <h1>App</h1>
-        <Form />
+      <div className='ui container'>
+        <h1>QNT Price Simulator</h1>
+        <DisplayPrice getPriceAndMcap={this.getPriceAndMcap()}cryptoInfo={this.state}/>
       </div>
     );
   }
